@@ -1,4 +1,4 @@
-// var yahooFinance = require('yahoo-finance');
+var yahooFinance = require('yahoo-finance');
 // var cron = require('node-cron');
 
 // yahooFinance.historical({
@@ -21,13 +21,15 @@
 
 
 // cron.schedule('*/1 * * * *', () => {
-//     console.log("33");
-//     yahooFinance.quote({
-//         symbol: 'AAPL',
-//         modules: [ 'price' ] // see the docs for the full list
-//       }, function (err, quotes) {
-//         console.log(quotes);
-//       });
+    console.log("33");
+    const STOCKS='ETH-USD__AAPL__BTC-USD__TSLA__GOOG__NFLX__AMZN__FB__XRP-USD__LT.NS__TTM__RELIANCE.NS'
+    const stocks = STOCKS.split("__");
+    yahooFinance.quote({
+        symbols: stocks,
+        modules: [ 'price' ] // see the docs for the full list
+      }, function (err, quotes) {
+        console.log(quotes);
+      });
 // });
 
 // var { YFinanceLive } = require('yfinance-live')
@@ -38,11 +40,11 @@
 // let yfinanceObj = new YFinanceLive(['GOOGL', 'AAPL', 'TSLA'], onchange)
 // console.log(yfinanceObj);
 
-const StockSocket = require("stocksocket");
+// const StockSocket = require("stocksocket");
 
-StockSocket.addTicker("TSLA", stockPriceChanged);
+// StockSocket.addTicker("ETH-USD", stockPriceChanged);
 
-function stockPriceChanged(data) {
-  //Choose what to do with your data as it comes in.
-  console.log(data);
-}
+// function stockPriceChanged(data) {
+//   //Choose what to do with your data as it comes in.
+//   console.log(data);
+// }

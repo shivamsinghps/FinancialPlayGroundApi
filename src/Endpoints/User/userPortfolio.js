@@ -28,9 +28,11 @@ exports.userSignup = async (req, res) => {
     try {
       const user = await UserData.findOne({ email: req.body.email });
       if (!user) {
-        let userObj = new User();
-        let hashObj = userObj.setPassword(password);
-        const newUser = new User({
+        let userObj = new UserData();
+        let hashObj = userObj.setPassword(req.body.password);
+        const newUser = new UserData({
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
           email: req.body.email,
           password: hashObj.hash,
           hash: hashObj.hash,
@@ -49,6 +51,7 @@ exports.userSignup = async (req, res) => {
           );
       }
     } catch (err) {
+      console.log(err);
       res
         .status(500)
         .send(resFormat.ErrorMsg(500, err.message, "server error", {}));
@@ -101,6 +104,8 @@ exports.userSignin = async (req, res) => {
             }
           );
           user.password = "";
+          user.hash = "";
+          user.salt = "";
           const tokenExpiry = Date.now() + 86400000;
           res
             .status(202)
@@ -124,7 +129,8 @@ exports.userSignin = async (req, res) => {
         .status(500)
         .send(resFormat.ErrorMsg(500, err.message, "server error", {}));
     }
-  }ī
+  }
+  ;
 };
 
 exports.passwordResetRequest = async (req, res) => {
@@ -140,13 +146,12 @@ exports.passwordResetRequest = async (req, res) => {
     } else {
       // Set password reset token and it's expiry
       const Otp = otp();
-      const otpExpiry = Date.now() + 3600000;
-      await UserData.findOneAndUpdate(
+      console.log(otp);
+      let newData = await UserData.findOneAndUpdate(
         { _id: user.id },
-        { otp: Otp, otpExpiry: otpExpiry },
+        { otp: `${Otp}` },
         { new: true }
       );
-
       // Email user reset link
       const resetLink = `${process.env.FRONTEND_URL}/resetPassword`;
 
@@ -175,7 +180,7 @@ exports.passwordResetRequest = async (req, res) => {
 };
 
 exports.passwordReset = async (req, res) => {
-  const { password, token, email } = req.body;
+  const { password, Otp, email } = req.body;
   try {
     if (!password) {
       res
@@ -203,11 +208,9 @@ exports.passwordReset = async (req, res) => {
       // Check if user exists and token is valid
       const user = await UserData.findOne({
         email,
-        passwordResetToken: token,
-        passwordResetTokenExpiry: {
-          $gte: Date.now() - 3600000,
-        },
+        otp: Otp,
       });
+      console.log(user);
       if (!user) {
         res
           .status(500)
@@ -226,27 +229,21 @@ exports.passwordReset = async (req, res) => {
           }
         );
         const tokenExpiry = Date.now() + 3600000;
-        bcrypt.hash(req.body.password, 10, async (err, hash) => {
-          if (err) {
-            res
-              .status(500)
-              .send(resFormat.ErrorMsg(500, err.message, "server error", {}));
-          } else {
-            user.passwordResetToken = "";
-            user.passwordResetTokenExpiry = "";
-            user.password = hash;
-            await user.save();
-            user.password = "";
-            res
-              .status(200)
-              .send(
-                resFormat.SuccessMsg(
-                  { tokenized, tokenExpiry, user },
-                  "Password Updated Successfully"
-                )
-              );
-          }
-        });
+        let userObj = new UserData();
+        let hashObj = userObj.setPassword(req.body.password);
+        user.otp = "";
+        user.password = hashObj.hash;
+        user.hash = hashObj.hash;
+        user.salt = hashObj.salt;
+        await user.save();
+        res
+          .status(200)
+          .send(
+            resFormat.SuccessMsg(
+              { tokenized, tokenExpiry, user },
+              "Password Updated Successfully"
+            )
+          );
       }
     }
   } catch (err) {
@@ -261,7 +258,7 @@ exports.userUpdate = async (req, res) => {
   try {
     const user = await UserData.findOneAndUpdate(
       { email: req.userData.email },
-      { ...data },
+      { firstName: data.firstName, lastName: data.lastName },
       { new: true }
     );
     if (!user) {
@@ -271,6 +268,9 @@ exports.userUpdate = async (req, res) => {
           resFormat.ErrorMsg(404, "User Not Found", "check your email", {})
         );
     } else {
+      user.password = "";
+      user.hash = "";
+      user.salt = "";
       res
         .status(200)
         .send(
@@ -296,7 +296,9 @@ exports.userDetails = async (req, res) => {
           resFormat.ErrorMsg(404, "User Not Found", "check your email", {})
         );
     } else {
-      user.password = null;
+      user.password = "";
+      user.hash = "";
+      user.salt = "";
       res
         .status(202)
         .send(resFormat.SuccessMsg(user, "Data of the Staff member"));
@@ -308,71 +310,72 @@ exports.userDetails = async (req, res) => {
   }
 };
 
-exports.imageUpload = async (req, res) => {
-  try {
-    const email = req.userData.email;
-    let user = await UserData.findOne({ email });
-    if (!user) {
-      res
-        .status(404)
-        .send(
-          resFormat.ErrorMsg(
-            (responseType = 404),
-            (message = "User Not Found"),
-            (userFriendlyMessage = "radiology user not found")
-          )
-        );
-    }
+// exports.imageUpload = async (req, res) => {
+//   try {
+//     const email = req.userData.email;
+//     let user = await UserData.findOne({ email });
+//     if (!user) {
+//       res
+//         .status(404)
+//         .send(
+//           resFormat.ErrorMsg(
+//             (responseType = 404),
+//             (message = "User Not Found"),
+//             (userFriendlyMessage = "radiology user not found")
+//           )
+//         );
+//     }
 
-    //delete from aws stack
-    if (user.image) {
-      var params = {
-        Bucket: process.env.s3Details.bucketName,
-        Key: user.image,
-      };
-      await deleteS3Object(params);
-    }
+//     //delete from aws stack
+//     if (user.image) {
+//       var params = {
+//         Bucket: process.env.s3Details.bucketName,
+//         Key: user.image,
+//       };
+//       await deleteS3Object(params);
+//     }
 
-    file = req.file;
-    const uploadFile = await uploadToAws(file.buffer);
-    if (!uploadFile.Location) {
-      res
-        .status(500)
-        .send(
-          resFormat.ErrorMsg(
-            (responseType = 500),
-            (message = "server error"),
-            (userFriendlyMessage = "Something went wrong while uploading File!")
-          )
-        );
-    }
-    const image = uploadFile.Location;
-    const imageTag = uploadFile.ETag;
-    const imageData = { image, imageTag };
-    const updateduser = await UserData.findOneAndUpdate(
-      { email },
-      { $set: { image } },
-      { new: true }
-    );
-    updateduser.password = " ";
-
-    res
-      .status(201)
-      .send(
-        resFormat.SuccessMsg(
-          { user: updateduser },
-          (userFriendlyMessage = "Successfully uploaded image")
-        )
-      );
-  } catch (err) {
-    res
-      .status(500)
-      .send(
-        resFormat.ErrorMsg(
-          (responseType = 500),
-          (message = "server error"),
-          (userFriendlyMessage = err.message)
-        )
-      );
-  }
-};
+//     file = req.file;
+//     const uploadFile = await uploadToAws(file.buffer);
+//     if (!uploadFile.Location) {
+//       res
+//         .status(500)
+//         .send(
+//           resFormat.ErrorMsg(
+//             (responseType = 500),
+//             (message = "server error"),
+//             (userFriendlyMessage = "Something went wrong while uploading File!")
+//           )
+//         );
+//     }
+//     const image = uploadFile.Location;
+//     const imageTag = uploadFile.ETag;
+//     const imageData = { image, imageTag };
+//     const updateduser = await UserData.findOneAndUpdate(
+//       { email },
+//       { $set: { image } },
+//       { new: true }
+//     );
+//     updateduser.password = "";
+//     updateduser.hash = "";
+//     updateduser.salt = "";
+//     res
+//       .status(201)
+//       .send(
+//         resFormat.SuccessMsg(
+//           { user: updateduser },
+//           (userFriendlyMessage = "Successfully uploaded image")
+//         )
+//       );
+//   } catch (err) {
+//     res
+//       .status(500)
+//       .send(
+//         resFormat.ErrorMsg(
+//           (responseType = 500),
+//           (message = "server error"),
+//           (userFriendlyMessage = err.message)
+//         )
+//       );
+//   }
+// };

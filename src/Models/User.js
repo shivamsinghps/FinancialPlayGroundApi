@@ -1,5 +1,4 @@
 const mongoose = require("mongoose"),
-  uniqueValidator = require("mongoose-unique-validator"),
   crypto = require("crypto"),
   Schema = mongoose.Schema;
 
@@ -63,18 +62,22 @@ const userSchema = new Schema(
       required: false,
     },
     otp: {
-      type: Number,
+      type: String,
     },
     currentWalletValue: {
+      type: Number,
       default: 10000,
     },
-    stats:[
-      {
-        key:String,
-        quantity:Number,
-        TotalPrice:Number,
-      }
-    ],
+    stats: {
+      type: [
+        {
+          key: String,
+          quantity: Number,
+          TotalPrice: Number,
+        },
+      ],
+      default: [],
+    },
     hash: String,
     salt: String,
   },
@@ -102,6 +105,4 @@ userSchema.methods.validPassword = (password, user) => {
   }
   return -1;
 };
-
-userSchema.plugin(uniqueValidator);
 module.exports = mongoose.model("User", userSchema, "User");
