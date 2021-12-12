@@ -223,7 +223,7 @@ exports.passwordReset = async (req, res) => {
             email: user.email,
             userId: user._id,
           },
-          process.env.secret,
+          process.env.SECRET,
           {
             expiresIn: "1d",
           }

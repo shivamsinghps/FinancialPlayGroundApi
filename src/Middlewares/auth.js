@@ -7,7 +7,7 @@ const resFormat = require("../Utils/format");
 module.exports = (req, res, next) => {
 	try {
 		const token = req.headers.authorization.split(' ')[1]
-		const decodedToken = jwt.verify(token, process.env.secret)
+		const decodedToken = jwt.verify(token, process.env.SECRET)
 		console.log(decodedToken);
 		if (!decodedToken || !decodedToken.id) {
 			res.status(401).send(resFormat.rError("Invalid Token"))
