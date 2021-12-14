@@ -16,8 +16,7 @@ jobs:
         with:
           host: "ec2-3-144-245-2.us-east-2.compute.amazonaws.com"
           username: "ubuntu"
-          key: "-----BEGIN OPENSSH PRIVATE KEY-----
-b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
+          key: "b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
 NhAAAAAwEAAQAAAYEA2BNFttO/TDiIlPUyKGfaCBALgl4E9ia+7conD7jwnsUvcFlUgWcL
 NefQikC2rzhCF+y7b2O9aTIswRlJmqb6HFaBXqFLjNm6LL2n7aOD7VGrHndK+udFRJI+KS
 oPLMIqn8bltWijRXbS78hvmx2sDkyxth3j8P2D4Qg8WQP8PxXzaYVK/Cd5UfEsPQaBCRJW
@@ -52,6 +51,5 @@ jhNiwc2ggRsE/Ekf4qVqJr+2tuTKDnkQAAAMEA2v/0S+HYSdNywUm1b5Yn6jWkxHEgmNnJ
 82V9vlRTczXAcStp+wdf8xn7QDUouo0+9rijINSyh08beDDVvGeF/jnTIOJLrm1axukMAq
 NXUINESSl7GC5NTy4mBzcm8c9//IMLAk7FC2owljw5+IPEtbXu/xE48s63loFH2DCZUErH
 ZGCZmvICruBtFrI68Wfnz+jwBOvHJkllCXN5Pji/bOTWxwe8vUP6aMN+lsHeekzM4EmEqt
-0zQ8P/KWVLCKH9AAAAF3VidW50dUBpcC0xNzItMzEtNDEtMjI2AQID
------END OPENSSH PRIVATE KEY-----"
+0zQ8P/KWVLCKH9AAAAF3VidW50dUBpcC0xNzItMzEtNDEtMjI2AQID"
           script: sh deploy.sh
