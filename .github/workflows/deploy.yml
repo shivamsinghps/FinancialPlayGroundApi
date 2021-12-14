@@ -14,9 +14,9 @@ jobs:
       - name: executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@master
         with:
-          host: "ec2-3-144-245-2.us-east-2.compute.amazonaws.com"
-          username: "ubuntu"
-          key: "-----BEGIN OPENSSH PRIVATE KEY-----
+          host: 3.144.245.2
+          username: ubuntu
+          key: -----BEGIN OPENSSH PRIVATE KEY-----
 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
 NhAAAAAwEAAQAAAYEAp3xqcAu6bAEXTjAxYQA/udBqRuL6rOgOnWBbr0p/nDdNOaqK4dSx
 qJ+yB0m7eo6JlH8Cbhe5UAVP8//p3QbxyJicvSD1jtmXzQRwj2+GSrc5ZRK9kYjjuTNbHw
@@ -53,5 +53,5 @@ v2rChnQZge1WFFfZ5WLunt/1lNdbUkajufP7jnUwfskcG9+58Z/jLyZvwixL0M93ayBUXS
 dNgP0QGpuHJPb0eCuPU8sPTI7wazzutFboZM4lH6u+exHxJDc+iSK+CY3GBghKUnM43QxL
 xkZH3qnoLqCwvROtFTP9hJmLaBBqP9dXNoKyZ5S4x57HTjgcu0GJ02FyecB12I/XnUHuLH
 42fAYf1HwlYIf1AAAAF3VidW50dUBpcC0xNzItMzEtNDEtMjI2AQID
------END OPENSSH PRIVATE KEY-----"
+-----END OPENSSH PRIVATE KEY-----
           script: sh deploy.sh
