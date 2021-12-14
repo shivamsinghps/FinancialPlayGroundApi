@@ -30,21 +30,3 @@ var yahooFinance = require('yahoo-finance');
       }, function (err, quotes) {
         console.log(quotes);
       });
-// });
-
-// var { YFinanceLive } = require('yfinance-live')
-
-// function onchange(data) {
-//   console.log(data)
-// }
-// let yfinanceObj = new YFinanceLive(['GOOGL', 'AAPL', 'TSLA'], onchange)
-// console.log(yfinanceObj);
-
-// const StockSocket = require("stocksocket");
-
-// StockSocket.addTicker("ETH-USD", stockPriceChanged);
-
-// function stockPriceChanged(data) {
-//   //Choose what to do with your data as it comes in.
-//   console.log(data);
-// }
