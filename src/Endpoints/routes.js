@@ -28,6 +28,8 @@ router.post("/reset_password", userPortfolio.passwordReset);
 
 // User Action Routes
 
+router.post("/get", userAction.get);
+
 router.post("/sell", checkAuth, userAction.sell);
 
 router.post("/buy", checkAuth, userAction.buy);

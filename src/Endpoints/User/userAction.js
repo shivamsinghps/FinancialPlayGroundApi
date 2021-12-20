@@ -1,9 +1,18 @@
 const UserData = require("../../Models/User");
 const TransactionData = require("../../Models/Transaction");
+// const Stocks = require("../../Models/Stocks");
+
 var yahooFinance = require("yahoo-finance");
 var yahooFinanceNews = require("yahoo-finance-news");
+var cron = require("node-cron");
 
 const resFormat = require("../../Utils/format");
+
+let GlobalListData = {};
+
+cron.schedule("*/1 * * * *", () => {
+  getGlobalData();
+});
 
 exports.buy = async (req, res) => {
   try {
@@ -72,6 +81,12 @@ exports.buy = async (req, res) => {
       .status(500)
       .send(resFormat.ErrorMsg(500, error.message, "server error", {}));
   }
+};
+
+exports.get = async (req, res) => {
+  try {
+    res.json({ quotes: GlobalListData });
+  } catch (error) {}
 };
 
 exports.sell = async (req, res) => {
@@ -250,25 +265,22 @@ exports.getData = async (req, res) => {
 
 exports.getListData = async (req, res) => {
   try {
-    const stocks = process.env.STOCKS.split("__");
-    yahooFinance.quote(
-      {
-        symbols: stocks,
-        modules: ["price"],
-      },
-      function (err, quotes) {
-        if (err) {
-          console.log(err);
-          res
-            .status(500)
-            .send(resFormat.ErrorMsg(500, err.message, "server error", {}));
-        } else {
-          res
-            .status(201)
-            .send(resFormat.SuccessMsg({ quotes }, `List to Stocks`));
-        }
-      }
-    );
+    if (
+      Object.keys(GlobalListData).length > 0 &&
+      GlobalListData.Error === undefined
+    ) {
+      res
+        .status(201)
+        .send(
+          resFormat.SuccessMsg({ quotes: GlobalListData }, `List to Stocks`)
+        );
+    } else {
+      res
+        .status(500)
+        .send(
+          resFormat.ErrorMsg(500, GlobalListData.Error, "server error", {})
+        );
+    }
   } catch (error) {
     res
       .status(500)
@@ -383,19 +395,25 @@ const saveTransaction = async (
   }
 };
 
-// const getStockData = async (stockId) => {
-//     let data;
-//     yahooFinance.quote(
-//         {
-//           symbol: stockId,
-//           modules: ["price", "summaryDetail"],
-//         },
-//         function (err, quote) {
-//           if (err) {
-//             throw err
-//           }
-//           data = quote
-//         }
-//       )
-//       return data
-// };
+const getGlobalData = async () => {
+  try {
+    const stocks = process.env.STOCKS.split("__");
+    yahooFinance.quote(
+      {
+        symbols: stocks,
+        modules: ["price"],
+      },
+      function (err, quotes) {
+        if (err) {
+          console.log("Application Error" + err.message);
+          GlobalListData.Error = "Error" + err.message;
+        } else {
+          console.log("Application Ready");
+          GlobalListData = quotes;
+        }
+      }
+    );
+  } catch (error) {
+    GlobalListData.Error = "Error" + error.message;
+  }
+};
