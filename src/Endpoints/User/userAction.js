@@ -409,7 +409,6 @@ const getGlobalData = async () => {
           console.log("Application Error" + err.message);
           GlobalListData.Error = "Error" + err.message;
         } else {
-          console.log("Application Ready");
           GlobalListData = quotes;
         }
       }
